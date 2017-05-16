@@ -1,6 +1,6 @@
 How to Steal Recipes
 by RecipeThiefNinjaMaster
 1) Install boiler.
-2) Read this cool recipe:
+2) Type boil crab and run boiler with crab.boil in the directory. You get:
 boil crab
 3) Profit!
