@@ -4,7 +4,6 @@
 //! Checks the same folder for a .boil, then the global folder for a .boil.
 //! Copyright (c) 2017 Noah Walker
 
-
 use std::io;
 use std::env;
 use std::fs::File;
@@ -18,19 +17,41 @@ fn get_boiled_name(filepath: &str) -> String {
     fp1.to_owned() + ".boiled" + fp2
 }
 
+/// This is better than just boil() - it outputs an embeddable string required for metaboiling.
+fn metaboil_from_shop(f: &mut File) -> Result<String, io::Error> {
+    let mut strbuf = String::new();
+    f.read_to_string(&mut strbuf)?;
+    Ok(boil_data(&strbuf)?
+           .iter()
+           .map(|x| x.trim())
+           .collect::<Vec<_>>()
+           .join("\n") + "\n")
+}
+
 /// 'Shop' for 'Ingredients' - Get the replacements through known paths.
-fn shop(filepath: &str) -> Result<File, io::Error> {
+fn shop(filepath: &str) -> Result<String, io::Error> {
     match File::open(filepath.to_owned() + ".boil") {
-        Ok(e) => Ok(e),
+        Ok(mut e) => metaboil_from_shop(&mut e),
         Err(_) => {
             match env::home_dir() {
                 Some(path) => {
                     match path.to_str() {
-                        Some(e) => match File::open(e.to_owned() + "/.boiler/" + filepath + ".boil") {
-                            Ok(f) => Ok(f),
-                            Err(e) => Err(io::Error::new(e.kind(),
-                                       format!("Error with {}: {}", filepath, e))),
-                        },
+                        Some(e) => {
+                            match File::open(e.to_owned() + "/.boiler/" + filepath + ".boil") {
+                                Ok(mut f) => metaboil_from_shop(&mut f),
+                                Err(_) => {
+                                    match File::open(filepath) {
+                                        Ok(mut f) => metaboil_from_shop(&mut f),
+                                        Err(e) => {
+                                            Err(io::Error::new(e.kind(),
+                                                               format!("Error with {}: {}",
+                                                                       filepath,
+                                                                       e)))
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         None => {
                             Err(io::Error::new(io::ErrorKind::NotFound,
                                                "Your home won't coerce to a string :("))
@@ -46,27 +67,32 @@ fn shop(filepath: &str) -> Result<File, io::Error> {
     }
 }
 
-/// Perform line by line boiling. Probably not the best code ever.
+/// Perform line by line boiling.
+fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
+    let lns = secret.lines();
+    let mut to_edit = vec![];
+    for (ln, line) in lns.clone().enumerate() {
+        // We found something!
+        if line.len() > 0 {
+            if line.split_whitespace().nth(0).unwrap() == "boil" {
+                to_edit.push(ln);
+            }
+        }
+    }
+    let mut to_write = lns.map(|x| x.to_string() + "\n").collect::<Vec<String>>();
+    for ln in to_edit {
+        to_write[ln] = shop(to_write[ln].split_whitespace().nth(1).unwrap())?;
+    }
+    Ok(to_write)
+}
+
+/// Boil a file.
 fn boil(argfile: String) -> Result<(), io::Error> {
     println!("Boiling {}", &argfile);
     let mut f = File::open(&argfile)?;
     let mut secret = String::new();
     f.read_to_string(&mut secret)?;
-    let lns = secret.lines();
-    let mut to_edit = vec![];
-    for (ln, line) in lns.clone().enumerate() {
-        // We found something!
-        if line.split_whitespace().nth(0).unwrap() == "boil" {
-            to_edit.push(ln);
-        }
-    }
-    let mut to_write = lns.map(|x| x.to_string() + "\n").collect::<Vec<String>>();
-    for ln in to_edit {
-        let mut shopper = String::new();
-        shop(to_write[ln].split_whitespace().nth(1).unwrap())?
-            .read_to_string(&mut shopper)?;
-        to_write[ln] = shopper.as_str().to_owned();
-    }
+    let to_write = boil_data(&secret)?;
     let mut nf = File::create(get_boiled_name(&argfile))?;
     for line in to_write {
         nf.write(line.as_bytes())?;
@@ -96,10 +122,12 @@ fn main() {
         }
     } else {
         match File::open("boiler.files.txt") {
-            Ok(mut f) => match batch_boil(&mut f) {
-                Err(e) => println!("Filelist error! {}", e),
-                Ok(()) => println!("Batch completed."),
-            },
+            Ok(mut f) => {
+                match batch_boil(&mut f) {
+                    Err(e) => println!("Filelist error! {}", e),
+                    Ok(()) => println!("Batch completed."),
+                }
+            }
             Err(_) => println!("Nothing to boil."),
         }
     }

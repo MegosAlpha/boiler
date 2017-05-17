@@ -1,6 +1,5 @@
-How to Steal Recipes
-by RecipeThiefNinjaMaster
+I am in example.txt.
 1) Install boiler.
-2) Type boil crab and run boiler with crab.boil in the directory. You get:
-boil crab
+2) Type boil metaboil and run boiler with crab.boil and helloalert.boil in the directory. You get:
+boil metaboil
 3) Profit!

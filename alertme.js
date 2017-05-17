@@ -1,1 +1,1 @@
-boil helloalert
+boil helloalert.irregular.js
