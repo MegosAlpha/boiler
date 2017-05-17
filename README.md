@@ -28,9 +28,11 @@ A: A lot quicker then you'd think. On my 2014 Intel i5 2-Core 1.4 base GHz compu
 - Metaboiling added
 - Irregular modules added
 - Metaboiling and Irregular Modules examples added
+
 1.1:
 - Filelist Support added
 - Filelist and more examples
+
 1.0:
 - Regular interpolation of boil files.
 - Regular modules.
@@ -38,6 +40,7 @@ A: A lot quicker then you'd think. On my 2014 Intel i5 2-Core 1.4 base GHz compu
 - boil syntax
 - Boiler tool
 - Examples
+
 0.0.1 (Prototype):
 - No features implemented (yet), just the scaffolding for the project
 
