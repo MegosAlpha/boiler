@@ -114,7 +114,7 @@ fn batch_boil(fl: &mut File) -> io::Result<()> {
 }
 
 fn main() {
-    println!("Boiler version 1.1");
+    println!("Boiler version 1.2");
     if env::args().len() > 1 {
         match boil(env::args().nth(1).unwrap()) {
             Ok(()) => println!("Boiling successful!"),
