@@ -31,12 +31,13 @@ fn metaboil_from_shop(f: &mut File) -> Result<String, io::Error> {
 }
 
 /// Loads and Parses the configuration.
-fn parse_config() -> HashMap<String, String> {
-    toml::from_str(r#"
-    name = 'My Name'
-    job = 'Doing stuff'
-    "#)
-            .unwrap()
+fn parse_config() -> io::Result<HashMap<String, String>> {
+    let mut txt = String::new();
+    File::open("boiler.config.toml")?.read_to_string(&mut txt)?;
+    match toml::from_str(txt.as_str()) {
+        Ok(t) => Ok(t),
+        Err(_) => Err(io::Error::new(io::ErrorKind::Other, "The file won't serialize - please check your syntax")),
+    }
 }
 
 /// 'Shop' for 'Ingredients' - Get the replacements through known paths (and in 1.3, config).
@@ -94,11 +95,17 @@ fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
     }
     // The file, with newlines re-added to a vector for looping.
     let mut to_write = lns.map(|x| x.to_string() + "\n").collect::<Vec<String>>();
-    let mconfig = parse_config();
+    let mut m_error = io::Error::new(io::ErrorKind::Other, "Configuration appeared to go fine");
+    let mconfig = match parse_config() {
+        Ok(m) => m,
+        Err(e) => {
+            m_error = e;
+            HashMap::new()
+        },
+    };
     for ln in to_edit {
         let mut modified = false;
         for key in mconfig.keys() {
-            println!("{}", key);
             if to_write[ln] == "boil ".to_owned() + key + "\n" {
                 to_write[ln] = mconfig.get(key).unwrap().clone() + "\n";
                 modified = true;
@@ -106,7 +113,13 @@ fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
             }
         }
         if !modified {
-            to_write[ln] = shop(to_write[ln].split_whitespace().nth(1).unwrap())?;
+            to_write[ln] = match shop(to_write[ln].split_whitespace().nth(1).unwrap()) {
+                Ok(st) => st,
+                Err(e) => {
+                    println!("{}, {}, continuing to boil.", m_error, e);
+                    "Error!".to_owned()
+                }
+            }
         }
     }
     Ok(to_write)
@@ -140,7 +153,7 @@ fn batch_boil(fl: &mut File) -> io::Result<()> {
 }
 
 fn main() {
-    println!("Boiler version 1.2");
+    println!("Boiler version 1.3");
     if env::args().len() > 1 {
         match boil(env::args().nth(1).unwrap()) {
             Ok(()) => println!("Boiling successful!"),
