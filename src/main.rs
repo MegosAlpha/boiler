@@ -4,10 +4,12 @@
 //! Checks the same folder for a .boil, then the global folder for a .boil.
 //! Copyright (c) 2017 Noah Walker
 
+extern crate toml;
 use std::io;
 use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
+use std::collections::HashMap;
 
 /// Returns name with .boiled before actual extension
 /// # Examples
@@ -28,7 +30,16 @@ fn metaboil_from_shop(f: &mut File) -> Result<String, io::Error> {
            .join("\n") + "\n")
 }
 
-/// 'Shop' for 'Ingredients' - Get the replacements through known paths.
+/// Loads and Parses the configuration.
+fn parse_config() -> HashMap<String, String> {
+    toml::from_str(r#"
+    name = 'My Name'
+    job = 'Doing stuff'
+    "#)
+            .unwrap()
+}
+
+/// 'Shop' for 'Ingredients' - Get the replacements through known paths (and in 1.3, config).
 fn shop(filepath: &str) -> Result<String, io::Error> {
     match File::open(filepath.to_owned() + ".boil") {
         Ok(mut e) => metaboil_from_shop(&mut e),
@@ -70,18 +81,33 @@ fn shop(filepath: &str) -> Result<String, io::Error> {
 /// Perform line by line boiling.
 fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
     let lns = secret.lines();
+    // Line numbers to check later
     let mut to_edit = vec![];
     for (ln, line) in lns.clone().enumerate() {
         // We found something!
         if line.len() > 0 {
             if line.split_whitespace().nth(0).unwrap() == "boil" {
+                // Push the line number
                 to_edit.push(ln);
             }
         }
     }
+    // The file, with newlines re-added to a vector for looping.
     let mut to_write = lns.map(|x| x.to_string() + "\n").collect::<Vec<String>>();
+    let mconfig = parse_config();
     for ln in to_edit {
-        to_write[ln] = shop(to_write[ln].split_whitespace().nth(1).unwrap())?;
+        let mut modified = false;
+        for key in mconfig.keys() {
+            println!("{}", key);
+            if to_write[ln] == "boil ".to_owned() + key + "\n" {
+                to_write[ln] = mconfig.get(key).unwrap().clone() + "\n";
+                modified = true;
+                break;
+            }
+        }
+        if !modified {
+            to_write[ln] = shop(to_write[ln].split_whitespace().nth(1).unwrap())?;
+        }
     }
     Ok(to_write)
 }
