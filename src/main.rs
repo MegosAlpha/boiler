@@ -36,24 +36,53 @@ fn parse_config() -> io::Result<HashMap<String, String>> {
     File::open("boiler.config.toml")?.read_to_string(&mut txt)?;
     match toml::from_str(txt.as_str()) {
         Ok(t) => Ok(t),
-        Err(_) => Err(io::Error::new(io::ErrorKind::Other, "The file won't serialize - please check your syntax")),
+        Err(_) => {
+            Err(io::Error::new(io::ErrorKind::Other,
+                               "The file won't serialize - please check your syntax"))
+        }
+    }
+}
+
+/// Less crazy matching structure in shop
+fn home_shop(filepath: &str) -> Result<String, io::Error> {
+    match env::home_dir() {
+        Some(path) => {
+            match path.to_str() {
+                Some(e) => {
+                    match File::open(e.to_owned() + "/.boiler/" + filepath + ".boil") {
+                        Ok(mut f) => metaboil_from_shop(&mut f),
+                        Err(e) => Err(e), 
+                    }
+                }
+                None => {
+                    Err(io::Error::new(io::ErrorKind::NotFound,
+                                       "Your home won't coerce to a string :("))
+                }
+            }
+        }
+        None => {
+            Err(io::Error::new(io::ErrorKind::NotFound,
+                               "According to our calculations, you have no home directory."))
+        }
     }
 }
 
 /// 'Shop' for 'Ingredients' - Get the replacements through known paths (and in 1.3, config).
 fn shop(filepath: &str) -> Result<String, io::Error> {
-    match File::open(filepath.to_owned() + ".boil") {
+    match File::open("recipes/".to_owned() + filepath + ".boil") {
         Ok(mut e) => metaboil_from_shop(&mut e),
         Err(_) => {
-            match env::home_dir() {
-                Some(path) => {
-                    match path.to_str() {
-                        Some(e) => {
-                            match File::open(e.to_owned() + "/.boiler/" + filepath + ".boil") {
+            match File::open("recipes/".to_owned() + filepath) {
+                Ok(mut f) => metaboil_from_shop(&mut f),
+                Err(_) => {
+                    match File::open(filepath.to_owned() + ".boil") {
+                        Ok(mut f) => metaboil_from_shop(&mut f),
+                        Err(_) => {
+                            match File::open(filepath) {
                                 Ok(mut f) => metaboil_from_shop(&mut f),
                                 Err(_) => {
-                                    match File::open(filepath) {
-                                        Ok(mut f) => metaboil_from_shop(&mut f),
+                                    match home_shop(filepath) {
+                                        Ok(f) => Ok(f),
                                         Err(e) => {
                                             Err(io::Error::new(e.kind(),
                                                                format!("Error with {}: {}",
@@ -64,20 +93,13 @@ fn shop(filepath: &str) -> Result<String, io::Error> {
                                 }
                             }
                         }
-                        None => {
-                            Err(io::Error::new(io::ErrorKind::NotFound,
-                                               "Your home won't coerce to a string :("))
-                        }
                     }
-                }
-                None => {
-                    Err(io::Error::new(io::ErrorKind::NotFound,
-                                       "According to our calculations, you have no home directory."))
                 }
             }
         }
     }
 }
+
 
 /// Perform line by line boiling.
 fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
@@ -101,7 +123,7 @@ fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
         Err(e) => {
             m_error = e;
             HashMap::new()
-        },
+        }
     };
     for ln in to_edit {
         let mut modified = false;
@@ -153,7 +175,7 @@ fn batch_boil(fl: &mut File) -> io::Result<()> {
 }
 
 fn main() {
-    println!("Boiler version 1.3");
+    println!("Boiler version 1.3.1");
     if env::args().len() > 1 {
         match boil(env::args().nth(1).unwrap()) {
             Ok(()) => println!("Boiling successful!"),
