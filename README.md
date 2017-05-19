@@ -64,4 +64,5 @@ A fake file format I made for fun. It's really just a joke. You can find its rep
 
 ## Coming Soon
 Configured Metaboiling - Boiled in from a config file instead of the filesystem, perhaps in TOML. **now in v1.3!**
-Project root search path - A path for an entire directory. **now in v1.3.1**
+
+Project root search path - A path for an entire directory. **now in v1.3.1!**
