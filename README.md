@@ -10,21 +10,21 @@ Modules aren't anything that special. ```boil <module-name>``` just loads accord
 
 ## Module Loading Paths
 If it starts with a / it's from the root on macOS or Linux. If it starts with C:/ or the drive, it is the drive root on Windows. Otherwise, it checks from the running directory.
-1) working directory + '/recipes/' + path + '.boil' (1.3.1)
-2) working directory + '/recipes/' + path (irregular modules loaded here) (1.3.1)
+1) 'recipes/' + path + '.boil' (1.3.1)
+2) 'recipes/' + path (irregular modules loaded here) (1.3.1)
 3) path + '.boil' (1.1)
 4) path (irregular modules loaded here) (1.2)
 5) home directory + '/.boiler/' + path + '.boil' (1.1)
 
 ## Using the tool
-Run ```boiler <filename>``` to boil a file or ```boiler``` to run a file list as specified in boiler.files.txt.
+Run ```boiler <filename>``` to boil a file or ```boiler``` to run a file or directory list as specified in boiler.files.txt.
 
 ## Directory Layout
 - README.md, LICENSE, Cargo.toml, Cargo.lock, and .gitignore are all just repository specific. They handle version numbers to an extent, information, and some git rules.
-- src/ contains the source folder. As of 1.3.1, it is still just main.rs. That's all the code.
-- examples/ contains the examples and tests for boiler. It's a little project.
+- src/ contains the source folder. As of 1.3.2, it is still just main.rs. That's all the code.
+- example/ contains the examples and tests for boiler. It's a little project.
 
-### Inside examples:
+### Inside example:
 - recipes/ contain 2 regular modules and 1 irregular module. They are used for the examples.
 - alertme.js, example.txt, and nametag.cpfffnajs are the examples. They use the recipe files for boiling.
 - boiler.config.toml is the configuration for the examples in here.
@@ -34,12 +34,15 @@ Run ```boiler <filename>``` to boil a file or ```boiler``` to run a file list as
 ### What is going on metaboil.boil?
 Version 1.2 (metaboiling and irregular modules) and higher cause files to be boiled when loaded. Do NOT let a file boil itself. It'll overflow memory pretty quick, because boiler is really fast. Metaboil is including other boiler files.
 ### How fast is this?
-A: A lot quicker then you'd think. On my 2014 Intel i5 2-Core 1.4 base GHz computer running Ubuntu 17.04, the examples in 1.3.1 clock in at **0.005-0.006** seconds total using the time tool in release mode (runs with optimizations in release). In debug mode, it's about 0.01 seconds. So it's lightning fast. 0.006ish seconds includes metaboiling, opening ~7 files, reading all files into memory and back out, interpolation, loops, configuration and a bunch of references and data type conversions.
+A: A lot quicker then you'd think. On my 2014 Intel i5 2-Core 1.4 base GHz computer running Ubuntu 17.04, the examples in 1.3.2 clock in at **0.004-0.006** seconds total using the time tool in release mode (runs with optimizations in release). In debug mode, it's about 0.01 seconds. So it's lightning fast. Benchmarking includes metaboiling, opening ~7 files, reading all files into memory and back out, interpolation, loops, directory checking, configuration and a bunch of references and data type conversions.
 ### What is a .cpfffnajs?
 A fake file format I made for fun. It's really just a joke. You can find its repository [here](https://github.com/MegosAlpha/cpfffnajs).
 
 ## Changelog
-1.3.1 (Latest):
+1.3.2 (Latest):
+- Directory boiling (even from filelists!)
+
+1.3.1 :
 - Project root search path implemented (/recipes).
 
 1.3:
@@ -69,3 +72,5 @@ A fake file format I made for fun. It's really just a joke. You can find its rep
 Configured Metaboiling - Boiled in from a config file instead of the filesystem, perhaps in TOML. **now in v1.3!**
 
 Project root search path - A path for an entire directory. **now in v1.3.1!**
+
+Recursive / Directory Boilings - Boil a directory instead of just files. **now in v1.3.2!**

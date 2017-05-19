@@ -1,0 +1,14 @@
+I am in example.txt.
+1) Install boiler.
+2) Type boil metaboil and run boiler with crab.boil and helloalert.boil in the directory. You get:
+I am metaboil.boil.
+When example.txt gets boiled, I get boiled, then boil crab and boil helloalert. Then crab and helloalert
+get interpolated into me. I then get interpolated back into example.txt.
+You will need:
+1 crab
+
+Step 1: Eat it.
+// I have issues with .boil, so I am taking the easy way out as an irregular module.
+alert('Hello world!');
+#boil metaboil BAD IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+3) Profit!

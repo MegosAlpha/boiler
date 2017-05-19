@@ -7,9 +7,10 @@
 extern crate toml;
 use std::io;
 use std::env;
-use std::fs::File;
+use std::fs::{File, metadata, canonicalize};
 use std::io::{Read, Write};
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// Returns name with .boiled before actual extension
 /// # Examples
@@ -147,16 +148,38 @@ fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
     Ok(to_write)
 }
 
+fn switchback(printout: &str, resetpath: &PathBuf) -> io::Result<()>{
+    println!("{}", printout);
+    env::set_current_dir(resetpath)?;
+    Ok(())
+}
+
 /// Boil a file.
 fn boil(argfile: String) -> Result<(), io::Error> {
-    println!("Boiling {}", &argfile);
-    let mut f = File::open(&argfile)?;
-    let mut secret = String::new();
-    f.read_to_string(&mut secret)?;
-    let to_write = boil_data(&secret)?;
-    let mut nf = File::create(get_boiled_name(&argfile))?;
-    for line in to_write {
-        nf.write(line.as_bytes())?;
+    let md = metadata(&argfile).unwrap();
+    if md.is_dir() {
+        println!("Boiling directory {}", argfile);
+        let starter = canonicalize(".")?;
+        env::set_current_dir(&argfile)?;
+        match File::open("boiler.files.txt") {
+            Ok(mut f) => {
+                match batch_boil(&mut f) {
+                    Err(e) => switchback(format!("Filelist error! {}", e).as_str(), &starter)?,
+                    Ok(()) => switchback("Batch completed!", &starter)?,
+                }
+            }
+            Err(_) => switchback("Nothing to boil.", &starter)?,
+        }
+    } else {
+        println!("Boiling file {}", argfile);
+        let mut f = File::open(&argfile)?;
+        let mut secret = String::new();
+        f.read_to_string(&mut secret)?;
+        let to_write = boil_data(&secret)?;
+        let mut nf = File::create(get_boiled_name(&argfile))?;
+        for line in to_write {
+            nf.write(line.as_bytes())?;
+        }
     }
     Ok(())
 }
@@ -175,7 +198,7 @@ fn batch_boil(fl: &mut File) -> io::Result<()> {
 }
 
 fn main() {
-    println!("Boiler version 1.3.1");
+    println!("Boiler version 1.3.2");
     if env::args().len() > 1 {
         match boil(env::args().nth(1).unwrap()) {
             Ok(()) => println!("Boiling successful!"),
