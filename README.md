@@ -20,12 +20,15 @@ If it starts with a / it's from the root on macOS or Linux. If it starts with C:
 Run ```boiler <filename>``` to boil a file or ```boiler``` to run a file list as specified in boiler.files.txt.
 
 ## Directory Layout
-README.md, LICENSE, Cargo.toml, Cargo.lock, and .gitignore are all just repository specific. They handle version numbers to an extent, information, and some git rules.
-src/ contains the source folder. As of 1.3.1, it is still just main.rs. That's all the code.
-recipes/ contain 2 regular modules and 1 irregular module. They are used for the examples.
-alertme.js, example.txt, and nametag.cpfffnajs are the examples. They use the recipe files for boiling.
-boiler.config.toml is the configuration for the examples in here.
-boiler.files.txt is the filelist of what to do without command line arguments.
+- README.md, LICENSE, Cargo.toml, Cargo.lock, and .gitignore are all just repository specific. They handle version numbers to an extent, information, and some git rules.
+- src/ contains the source folder. As of 1.3.1, it is still just main.rs. That's all the code.
+- examples/ contains the examples and tests for boiler. It's a little project.
+
+### Inside examples:
+- recipes/ contain 2 regular modules and 1 irregular module. They are used for the examples.
+- alertme.js, example.txt, and nametag.cpfffnajs are the examples. They use the recipe files for boiling.
+- boiler.config.toml is the configuration for the examples in here.
+- boiler.files.txt is the filelist of what to do without command line arguments.
 
 ## FAQ
 ### What is going on metaboil.boil?
