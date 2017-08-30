@@ -39,6 +39,11 @@ A: A lot quicker then you'd think. On my 2014 Intel i5 2-Core 1.4 base GHz compu
 A fake file format I made for fun. It's really just a joke. You can find its repository [here](https://github.com/MegosAlpha/cpfffnajs).
 
 ## Changelog
+1.4 (Future):
+- Implement EVOlved (Entity Virtual Object)
+	- Includes dynamic (logic-powered) interpolation
+- Change interpolation syntax
+
 1.3.2 (Latest):
 - Directory boiling (even from filelists!)
 
@@ -74,3 +79,7 @@ Configured Metaboiling - Boiled in from a config file instead of the filesystem,
 Project root search path - A path for an entire directory. **now in v1.3.1!**
 
 Recursive / Directory Boilings - Boil a directory instead of just files. **now in v1.3.2!**
+
+EVOlved Implementation - Dynamic interpolation via functions, written in a language like Python, Lua, NQP, etc.
+
+New Syntax - Standard ---> [{boil that}], [{mathbot 1+1}] <--- EVOlved
