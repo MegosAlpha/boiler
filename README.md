@@ -39,17 +39,15 @@ A: A lot quicker then you'd think. On my 2014 Intel i5 2-Core 1.4 base GHz compu
 A fake file format I made for fun. It's really just a joke. You can find its repository [here](https://github.com/MegosAlpha/cpfffnajs).
 
 ## Changelog
-Checkout boiler-evolved for new features:
+1.4 (future):
 - Implement EVOlved (Entity Virtual Object)
 	- Includes dynamic (logic-powered) interpolation
 - New interpolation syntax
 
-Now in maintenance!
-
 1.3.2 (Latest):
 - Directory boiling (even from filelists!)
 
-1.3.1 :
+1.3.1:
 - Project root search path implemented (/recipes).
 
 1.3:
