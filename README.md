@@ -34,7 +34,7 @@ Run ```boiler <filename>``` to boil a file or ```boiler``` to run a file or dire
 ### What is going on metaboil.boil?
 Version 1.2 (metaboiling and irregular modules) and higher cause files to be boiled when loaded. Do NOT let a file boil itself. It'll overflow memory pretty quick, because boiler is really fast. Metaboil is including other boiler files.
 ### How fast is this?
-A: A lot quicker then you'd think. On my 2014 Intel i5 2-Core 1.4 base GHz computer running Ubuntu 17.04, the examples in 1.3.2 clock in at **0.004-0.006** seconds total using the time tool in release mode (runs with optimizations in release). In debug mode, it's about 0.01 seconds. So it's lightning fast. Benchmarking includes metaboiling, opening ~7 files, reading all files into memory and back out, interpolation, loops, directory checking, configuration and a bunch of references and data type conversions.
+A: A lot quicker then you'd think. On my i7-7700HQ, the examples in 1.4 clock in at **0.011** seconds total using the time tool in release mode (runs with optimizations in release). In debug mode, it's about 0.096 seconds. So Boiler is lightning fast. Benchmarking includes metaboiling, opening ~7 files, reading all files into memory and back out, interpolation, loops, directory checking, configuration, regex parsing and a bunch of references and data type conversions. See the example folder for more information.
 ### What is a .cpfffnajs?
 A fake file format I made for fun. It's really just a joke. You can find its repository [here](https://github.com/MegosAlpha/cpfffnajs).
 

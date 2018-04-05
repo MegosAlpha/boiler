@@ -119,7 +119,6 @@ fn boil_data (secret: &String) -> Result<Vec<String>, io::Error> {
     };
     // Check all the matching capture groups, and boil them. Once boiled, add them if it is unique.
     for caps in re.captures_iter(secret) {
-        println!("match found");
         if !boilset.contains_key(&caps[0]) {
             if mconfig.contains_key(&caps[1]) {
                 boilset.insert(caps[0].to_string(), match mconfig.get(&caps[1]) {
@@ -135,7 +134,6 @@ fn boil_data (secret: &String) -> Result<Vec<String>, io::Error> {
         }
     }
     for (key,val) in boilset.iter() {
-        println!("{}: {}", key, val);
         ret_secret = ret_secret.replace(key, val);
     }
     //println!("{}", ret_secret);
@@ -192,7 +190,7 @@ fn batch_boil(fl: &mut File) -> io::Result<()> {
 }
 
 fn main() {
-    println!("Boiler version 1.3.2");
+    println!("Boiler version 1.4.0");
     if env::args().len() > 1 {
         match boil(env::args().nth(1).unwrap()) {
             Ok(()) => println!("Boiling successful!"),

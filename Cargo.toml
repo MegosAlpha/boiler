@@ -1,6 +1,6 @@
 [package]
 name = "boiler"
-version = "1.4"
+version = "1.4.0"
 authors = ["MegosAlpha"]
 
 [dependencies]
