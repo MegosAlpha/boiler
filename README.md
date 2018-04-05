@@ -2,7 +2,7 @@
 Have some code that's split into modules, but you don't want to copy-paste, deal with config, etc.?
 Boiler to the rescue! Currently at version 1.3.1. It even supports languages as in English. It's as easy as:
 ```boiler
-boil <module-name>
+{boil name}
 ```
 
 ## Modules
