@@ -86,6 +86,8 @@ Project root search path - A path for an entire directory. **now in v1.3.1!**
 
 Recursive / Directory Boilings - Boil a directory instead of just files. **now in v1.3.2!**
 
+New Syntax and Regex Parsing - {boil name} anywhere in the file **now in v1.4!**
+
 EVOlved Implementation - Dynamic interpolation via functions, written in a language like Python, Lua, NQP, etc.
 
-New Syntax - Standard ---> [{boil that}], [{mathbot 1+1}] <--- EVOlved
+New Syntax for Evolved - {boil scriptname param1 param2...}]
