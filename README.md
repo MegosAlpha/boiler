@@ -50,7 +50,7 @@ A fake file format I made for fun. It's really just a joke. You can find its rep
 ```
 - Regex based processing - no longer line-by-line, you can boil inside lines.
 
-1.3.2 (Latest):
+1.3.2:
 - Directory boiling (even from filelists!)
 
 1.3.1:
