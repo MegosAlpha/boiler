@@ -1,7 +1,8 @@
 [package]
 name = "boiler"
-version = "1.3.2"
+version = "1.4"
 authors = ["MegosAlpha"]
 
 [dependencies]
 toml = "0.4.1"
+regex = "0.2.10"

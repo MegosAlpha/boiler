@@ -1,6 +1,6 @@
 I am metaboil.boil.
 When example.txt gets boiled, I get boiled, then boil crab and boil helloalert. Then crab and helloalert
 get interpolated into me. I then get interpolated back into example.txt. 
-boil crab
-boil helloalert.irregular.js
+{boil crab}
+{boil helloalert.irregular.js}
 #boil metaboil BAD IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

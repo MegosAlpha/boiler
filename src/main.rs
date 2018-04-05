@@ -4,6 +4,8 @@
 //! Checks the same folder for a .boil, then the global folder for a .boil.
 //! Copyright (c) 2017 Noah Walker
 
+extern crate regex;
+use regex::Regex;
 extern crate toml;
 use std::io;
 use std::env;
@@ -101,51 +103,43 @@ fn shop(filepath: &str) -> Result<String, io::Error> {
     }
 }
 
-
-/// Perform line by line boiling.
-fn boil_data(secret: &String) -> Result<Vec<String>, io::Error> {
-    let lns = secret.lines();
-    // Line numbers to check later
-    let mut to_edit = vec![];
-    for (ln, line) in lns.clone().enumerate() {
-        // We found something!
-        if line.len() > 0 {
-            if line.split_whitespace().nth(0).unwrap() == "boil" {
-                // Push the line number
-                to_edit.push(ln);
-            }
-        }
-    }
-    // The file, with newlines re-added to a vector for looping.
-    let mut to_write = lns.map(|x| x.to_string() + "\n").collect::<Vec<String>>();
-    let mut m_error = io::Error::new(io::ErrorKind::Other, "Configuration appeared to go fine");
+/// Perform regular expression boiling (v1.4) - replaces line-by-line style
+fn boil_data (secret: &String) -> Result<Vec<String>, io::Error> {
+    let mut ret_secret = secret.clone();
+    // Match the file names
+    let re = Regex::new(r"\{boil ([\w\d.]+)\}").unwrap();
+    // Prepare a set to put all the matches into (eliminating the chances of matches - after all, Boiler likes pure functions when dealing with files)
+    let mut boilset = HashMap::new();
+    // Parse the configuration, it's sort of important
     let mconfig = match parse_config() {
         Ok(m) => m,
-        Err(e) => {
-            m_error = e;
+        Err(_) => {
             HashMap::new()
         }
     };
-    for ln in to_edit {
-        let mut modified = false;
-        for key in mconfig.keys() {
-            if to_write[ln] == "boil ".to_owned() + key + "\n" {
-                to_write[ln] = mconfig.get(key).unwrap().clone() + "\n";
-                modified = true;
-                break;
-            }
-        }
-        if !modified {
-            to_write[ln] = match shop(to_write[ln].split_whitespace().nth(1).unwrap()) {
-                Ok(st) => st,
-                Err(e) => {
-                    println!("{}, {}, continuing to boil.", m_error, e);
-                    "Error!".to_owned()
-                }
+    // Check all the matching capture groups, and boil them. Once boiled, add them if it is unique.
+    for caps in re.captures_iter(secret) {
+        println!("match found");
+        if !boilset.contains_key(&caps[0]) {
+            if mconfig.contains_key(&caps[1]) {
+                boilset.insert(caps[0].to_string(), match mconfig.get(&caps[1]) {
+                    Some(r) => r,
+                    None => ""
+                }.to_string());
+            } else {
+                boilset.insert(caps[0].to_string(), match shop(&caps[1]) {
+                    Ok(r) => r.trim().to_string(),
+                    Err(_) => "".to_string()
+                });
             }
         }
     }
-    Ok(to_write)
+    for (key,val) in boilset.iter() {
+        println!("{}: {}", key, val);
+        ret_secret = ret_secret.replace(key, val);
+    }
+    //println!("{}", ret_secret);
+    return Ok(ret_secret.lines().map(|x| x.to_string() + "\n").collect::<Vec<String>>());
 }
 
 fn switchback(printout: &str, resetpath: &PathBuf) -> io::Result<()>{
